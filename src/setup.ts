@@ -12,10 +12,38 @@ export const context = canvasEl.getContext('2d')!
 canvasEl.width = window.innerWidth
 canvasEl.height = window.innerHeight
 
+export let centerX = canvasEl.width / 2
+export let centerY = canvasEl.height / 2
+export let canvasWidth = canvasEl.width
+export let canvasHeight = canvasEl.height
+export let windowWidth = window.innerWidth
+export let windowHeight = window.innerHeight
+
+export let mouseX = 0
+export let mouseY = 0
+
 export function canvasSize(width: number, height: number) {
 	canvasEl.width = width
 	canvasEl.height = height
 }
+
+export function resizeCanvas(resizeAction?: () => void) {
+	window.addEventListener('resize', () => {
+		canvasEl.width = window.innerWidth
+		canvasEl.height = window.innerHeight
+		window.centerX = canvasEl.width / 2
+		window.centerY = canvasEl.height / 2
+		window.canvasWidth = canvasEl.width
+		window.canvasHeight = canvasEl.height
+		window.windowWidth = window.innerWidth
+		window.windowHeight = window.innerHeight
+
+		if (resizeAction) {
+			resizeAction()
+		}
+	})
+}
+
 export function background(color: string) {
 	canvasEl.style.backgroundColor = color
 }
@@ -101,6 +129,10 @@ export function stroke(color: string) {
 	c.strokeStyle = color
 }
 
+export function strokeWidth(strokeWidth: number) {
+	c.lineWidth = strokeWidth
+}
+
 export function text(text: string, coordinates: Coordinates) {
 	c.beginPath()
 	c.font = 'bold 18px monospace'
@@ -113,21 +145,46 @@ export function clear() {
 	c.clearRect(0, 0, canvasEl.width, canvasEl.height)
 }
 
+export function animate(animationFunction: () => void) {
+	function draw() {
+		animationFunction()
+		requestAnimationFrame(draw)
+	}
+
+	requestAnimationFrame(draw)
+}
+
+window.addEventListener('mousemove', (event) => {
+	window.mouseX = event.x
+	window.mouseY = event.y
+})
+
 const canvas = {
 	canvas: canvasEl,
 	c: context,
+	centerX,
+	centerY,
+	canvasWidth,
+	canvasHeight,
+	windowWidth,
+	windowHeight,
 	canvasSize,
+	resizeCanvas,
 	background,
 	grid,
 	translate,
 	coordinateSystem,
 	circle,
 	line,
+	strokeWidth,
 	point,
 	text,
 	fill,
 	stroke,
 	clear,
+	mouseX,
+	mouseY,
+	animate,
 }
 
 Object.assign(window, canvas)
